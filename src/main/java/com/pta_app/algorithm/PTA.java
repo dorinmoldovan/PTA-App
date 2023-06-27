@@ -73,6 +73,9 @@ public class PTA {
             }
         }
 
+        for(int i = 0; i < I; i++) {
+
+        }
 
         double endTime = System.currentTimeMillis();
         double duration = endTime - startTime;
