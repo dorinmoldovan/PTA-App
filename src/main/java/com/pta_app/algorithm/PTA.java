@@ -25,15 +25,60 @@ public class PTA {
     private Double FR_min;
     private Double FR_max;
     private Double eps;
-    private Double X_min;
-    private Double X_max;
 
-    public PTA() {
+    public PTA(int n, int i, int d, double FT, double RT, double minFR, double maxFR, double eps, OF of) {
+        this.N = n;
+        this.I = i;
+        this.D = d;
+        this.FT = FT;
+        this.RT = RT;
+        this.FR_min = minFR;
+        this.FR_max = maxFR;
+        this.eps = eps;
+        this.of = of;
         this.rand = new Random(System.currentTimeMillis());
+    }
+
+    public List<Flower> generateFlowers() {
+        List<Flower> flowers = new ArrayList<Flower>();
+        for(int i = 0; i < this.N; i++) {
+            Flower flower = new Flower(this.rand, this.D, this.FT, this.RT, this.FR_min, this.FR_max, this.eps, of.getMinValue(), of.getMaxValue());
+            flowers.add(flower);
+        }
+        return flowers;
     }
 
     public Result run() {
         Result result = new Result();
+
+        double startTime = System.currentTimeMillis();
+        List<Flower> flowers = generateFlowers();
+        for(int i = 0; i < flowers.size(); i++) {
+            double fitness = of.compute(flowers.get(i).getPosition());
+            flowers.get(i).setFitness(fitness);
+        }
+        List<Flower> plums = new ArrayList<>();
+        for(int i = 0; i < flowers.size(); i++) {
+            Flower plum = SerializationUtils.clone(flowers.get(i));
+            plums.add(plum);
+        }
+        Flower gBest = null;
+        for(int i = 0; i < plums.size(); i++) {
+            if(i == 0) {
+                gBest =  SerializationUtils.clone(plums.get(i));
+            } else {
+                if(plums.get(i).getFitness() < gBest.getFitness()) {
+                    gBest =  SerializationUtils.clone(plums.get(i));
+                }
+            }
+        }
+
+
+        double endTime = System.currentTimeMillis();
+        double duration = endTime - startTime;
+        result.setGlobalBest(gBest);
+        result.setRunningTime(duration);
+
         return result;
     }
 
@@ -115,21 +160,5 @@ public class PTA {
 
     public void setEps(Double eps) {
         this.eps = eps;
-    }
-
-    public Double getX_min() {
-        return X_min;
-    }
-
-    public void setX_min(Double x_min) {
-        X_min = x_min;
-    }
-
-    public Double getX_max() {
-        return X_max;
-    }
-
-    public void setX_max(Double x_max) {
-        X_max = x_max;
     }
 }
