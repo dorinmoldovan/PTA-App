@@ -196,7 +196,7 @@ public class App {
                 textArea.append("  NEW SIMULATION\n");
                 textArea.append("  ------------------------------------------------------------\n");
 
-                textArea.append("  Number of horses (N) = " + N + "\n");
+                textArea.append("  Number of plums (N) = " + N + "\n");
                 textArea.append("  Number of iterations (I) = " + I + "\n");
                 textArea.append("  Number of dimensions (D) = " + D + "\n");
                 textArea.append("  Fruitiness threshold (FT) = " + FT + "\n");
