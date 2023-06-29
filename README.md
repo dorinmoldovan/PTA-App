@@ -11,7 +11,7 @@ A Java implementation of the Plum Tree Algorithm (PTA).
 
 ## PTA-App Simulation
 
-![PTA-App Snapshot](pta_app_snapshot.PNG?raw=true "Title")
+![PTA-App Snapshot](pta_app_snapshot.png?raw=true "Title")
 
 ## Author
 
