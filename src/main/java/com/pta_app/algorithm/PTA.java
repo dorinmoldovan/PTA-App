@@ -7,10 +7,6 @@ import com.pta_app.model.*;
 import com.pta_app.objective_functions.OF;
 
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Random;
-
 import org.apache.commons.lang3.SerializationUtils;
 
 public class PTA {
@@ -73,8 +69,73 @@ public class PTA {
             }
         }
 
+        Flower unripePlum = new Flower(this.rand, this.D, this.FT, this.RT, this.FR_min, this.FR_max, this.eps);
+        unripePlum.setFitness(Double.MAX_VALUE);
+        Flower ripePlum = new Flower(this.rand, this.D, this.FT, this.RT, this.FR_min, this.FR_max, this.eps);
+        ripePlum.setFitness(Double.MAX_VALUE);
+
         for(int i = 0; i < I; i++) {
 
+            // compute the ripe and unripe plums
+
+            for(int j = 0; j < N; j++) {
+                double fitness = plums.get(j).getFitness();
+                if (fitness < ripePlum.getFitness()) {
+                    unripePlum = SerializationUtils.clone(ripePlum);
+                    ripePlum = SerializationUtils.clone(plums.get(j));
+                }
+                if (fitness > ripePlum.getFitness() && fitness < unripePlum.getFitness()) {
+                    unripePlum = SerializationUtils.clone(plums.get(j));
+                }
+            }
+
+            // compute the new positions of the flowers
+
+            for(int j = 0; j < N; j++) {
+                double rp = rand.nextDouble();
+                if (rp >= FT) {
+                    flowers.get(j).fruitinessPhase(plums.get(j));
+                } else if (rp >= RT) {
+                    flowers.get(j).ripenessPhase(ripePlum, unripePlum);
+                } else {
+                    flowers.get(j).storenessPhase(plums.get(j), ripePlum);
+                }
+            }
+
+            // adjust the positions of the flowers
+
+            for(int j = 0; j < N; j++) {
+                flowers.get(j).adjustPosition();
+            }
+
+            // update the positions of the plums
+
+            for(int j = 0; j < N; j++) {
+                double flowerFitness = of.compute(flowers.get(j).getPosition());
+                flowers.get(j).setFitness(flowerFitness);
+                double plumFitness = of.compute(plums.get(j).getPosition());
+                plums.get(j).setFitness(plumFitness);
+                if(flowerFitness < plumFitness) {
+                    plums.set(j, SerializationUtils.clone(flowers.get(j)));
+                }
+            }
+
+            // update the gBest value
+
+            double minimum = plums.get(0).getFitness();
+            int minIndex = 0;
+            for(int j = 1; j < N; j++) {
+                if(plums.get(j).getFitness() < minimum) {
+                    minimum = plums.get(j).getFitness();
+                    minIndex = j;
+                }
+            }
+            if (minimum < gBest.getFitness()) {
+                gBest = SerializationUtils.clone(plums.get(minIndex));
+            }
+
+            result.setLogs(result.getLogs() + "  Iteration " + (i + 1) + "\n");
+            result.setLogs(result.getLogs() + "  GBest = " + gBest.getFitness() + "\n");
         }
 
         double endTime = System.currentTimeMillis();
